@@ -32,8 +32,28 @@ const authSlice = createSlice({
       state.avatar = null;
       state.nickname = null;
     },
+    updateProfile: (state, action) => {
+      const { nickname, avatar, userId } = action.payload;
+      localStorage.setItem("avatar", avatar);
+      localStorage.setItem("nickname", nickname);
+      localStorage.setItem("userId", userId);
+      state.avatar = avatar;
+      state.nickname = nickname;
+      state.userId = userId;
+    },
+    deleteAccount: (state) => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("avatar");
+      localStorage.removeItem("nickname");
+      state.logging = false;
+      state.userId = null;
+      state.avatar = null;
+      state.nickname = null;
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, updateProfile, deleteAccount } =
+  authSlice.actions;
 export default authSlice.reducer;

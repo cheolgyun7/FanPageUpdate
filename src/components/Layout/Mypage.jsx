@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import styled from "styled-components";
 import { Content } from "styles/theme";
+import { updateProfile } from "../../redux/authSlice";
 import axios from "axios";
-import { login } from "../../redux/authSlice";
-import { updateMessageSuccess } from "../../redux/reducer";
 
 const Mypage = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
+  console.log(auth);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [updatedNickname, setUpdatedNickname] = useState(auth.nickname);
@@ -35,8 +35,18 @@ const Mypage = () => {
           nickname: updatedNickname,
           userId: updatedUserId,
         };
-
-        dispatch(updateMessageSuccess(updatedData));
+        const token = localStorage.getItem("accessToken");
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await axios.patch(
+          "https://moneyfulpublicpolicy.co.kr/profile",
+          updatedData,
+          config
+        );
+        dispatch(updateProfile(response));
         localStorage.setItem("nickname", updatedNickname);
         localStorage.setItem("userId", updatedUserId);
       } catch (error) {
