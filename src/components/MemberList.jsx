@@ -1,13 +1,12 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectMember } from "../redux/action";
+import { selectMember } from "../redux/reducer";
 import styled from "styled-components";
 
 const members = ["", "Karina", "Winter", "Giselle", "Ningning"];
 const MemberList = () => {
-  const selectedMember = useSelector((state) => state.selectedMember);
+  const selectedMember = useSelector((state) => state.letter.selectedMember);
   const dispatch = useDispatch();
-
   const handleMemberClick = (memberName) => {
     dispatch(selectMember(memberName));
   };

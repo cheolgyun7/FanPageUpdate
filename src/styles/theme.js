@@ -8,6 +8,14 @@ export const HeaderBox = styled.header`
   padding: 1.5rem;
   font-size: 1.5rem;
   color: white;
+  p {
+    &:first-of-type {
+      &:hover {
+        color: #ffff96;
+        cursor: pointer;
+      }
+    }
+  }
 `;
 export const FooterBox = styled.footer`
   background-color: #2a1215;

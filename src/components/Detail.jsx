@@ -2,42 +2,39 @@ import React, { useState } from "react";
 import { Content } from "styles/theme";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteMessage, updateMessage } from "../redux/reducer";
 
 const Detail = () => {
   const { state } = useLocation();
   const [editContext, setEditContext] = useState(state.context);
   const [modalOpen, setModalOpen] = useState(false);
+  const auth = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   const sendModify = () => {
     setModalOpen(true);
   };
+
   const editSubmit = () => {
-    const updatedLetterList = JSON.parse(
-      localStorage.getItem("letterList")
-    ).map((item) => {
-      if (item.id === state.id) {
-        return { ...item, context: editContext };
-      }
-      return item;
-    });
-    localStorage.setItem("letterList", JSON.stringify(updatedLetterList));
-    // 모달 닫기
+    dispatch(
+      updateMessage({
+        ...state, // state 안에 있는 모든 데이터를 updatedData로 복사
+        context: editContext, // context만 새로운 값으로 덮어쓰기
+      })
+    );
     setModalOpen(false);
   };
+
   const handleEdit = (e) => {
     setEditContext(e.target.value);
   };
 
   const sendDelete = () => {
-    // modal에서 삭제기능
     const confirmation = window.confirm("정말로 삭제하시겠습니까?");
     if (confirmation) {
-      const deleteLetterList = JSON.parse(
-        localStorage.getItem("letterList")
-      ).filter((item) => item.id !== state.id);
-      localStorage.setItem("letterList", JSON.stringify(deleteLetterList));
-      // 홈 페이지로 이동
-      window.location.href = "/"; // 홈 페이지 경로로 이동
+      dispatch(deleteMessage(state.id));
+      window.location.href = "/"; // 홈 페이지로 이동
     }
   };
 
@@ -64,10 +61,12 @@ const Detail = () => {
           >
             뒤로가기
           </BackButton>
-          <div>
-            <CardButton onClick={sendModify}>수정</CardButton>
-            <CardButton onClick={sendDelete}>삭제</CardButton>
-          </div>
+          {auth.userId === state.userId && (
+            <div>
+              <CardButton onClick={sendModify}>수정</CardButton>
+              <CardButton onClick={sendDelete}>삭제</CardButton>
+            </div>
+          )}
         </CardBox>
       </Content>
 
