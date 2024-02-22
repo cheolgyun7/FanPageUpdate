@@ -3,55 +3,55 @@ import { useState } from "react";
 import { Content } from "styles/theme";
 import styled from "styled-components";
 import { login } from "../../redux/authSlice";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import useForm from "hooks/useForm";
+import { authApi } from "api";
 
 const Login = () => {
   const [isLogined, setIsLogined] = useState(true);
   const dispatch = useDispatch();
-  const [signUpFormData, setSignUpFormData] = useState({
+
+  const { formState, handleChange, resetForm } = useForm({
     id: "",
     password: "",
     nickname: "",
   });
+  const { id, password, nickname } = formState;
   const togglePage = () => {
     setIsLogined(!isLogined);
-  };
-  const handleChange = (e) => {
-    setSignUpFormData({
-      ...signUpFormData,
-      [e.target.name]: e.target.value,
-    });
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (isLogined) {
-        const response = await axios.post(
-          "https://moneyfulpublicpolicy.co.kr/login",
-          {
-            id: signUpFormData.id,
-            password: signUpFormData.password,
-          }
-        );
-        console.log("로그인 성공", response.data);
-        dispatch(login(response.data));
-        setIsLogined(true);
-        toast.success("로그인에 성공하셨습니다");
-        setSignUpFormData("");
+        const { data } = await authApi.post("/login", {
+          id,
+          password,
+        });
+        const { accessToken, avatar, nickname, userId } = data;
+        if (data.success) {
+          dispatch(login({ accessToken, avatar, nickname, userId }));
+          setIsLogined(true);
+          toast.success("로그인에 성공하셨습니다");
+          resetForm();
+        }
       } else {
-        const response = await axios.post(
-          "https://moneyfulpublicpolicy.co.kr/register",
-          signUpFormData
-        );
-        console.log("성공", response.data);
+        const { data } = await authApi.post("/register", {
+          id,
+          password,
+          nickname,
+        });
+        if (data.success) {
+          resetForm();
+          toast.success("회원가입성공");
+        }
       }
     } catch (error) {
       if (isLogined) {
         toast.error("로그인 실패", error.message); // 실패 시 에러 메시지 출력
       } else {
-        console.error("회원가입 실패", error.message); // 실패 시 에러 메시지 출력
+        toast.error("회원가입 실패", error.message); // 실패 시 에러 메시지 출력
       }
     }
   };
@@ -65,7 +65,7 @@ const Login = () => {
               type="text"
               placeholder="아이디(4~10글자)"
               name="id"
-              value={signUpFormData.id || ""}
+              value={formState.id || ""}
               onChange={handleChange}
             />
             <br />
@@ -73,7 +73,7 @@ const Login = () => {
               type="password"
               placeholder="비밀번호(4~10글자)"
               name="password"
-              value={signUpFormData.password || ""}
+              value={formState.password || ""}
               onChange={handleChange}
             />
             <br />
@@ -82,7 +82,7 @@ const Login = () => {
                 type="text"
                 placeholder="닉네임(4~10글자)"
                 name="nickname"
-                value={signUpFormData.nickname}
+                value={formState.nickname}
                 onChange={handleChange}
               />
             )}

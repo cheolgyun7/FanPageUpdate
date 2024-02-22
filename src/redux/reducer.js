@@ -10,6 +10,21 @@ const initialState = {
   error: null,
 };
 
+export const __addLetter = createAsyncThunk(
+  "addLetter",
+  async (newLetter, thunkAPI) => {
+    try {
+      await axios.post("http://localhost:5000/letterList", newLetter);
+      const { data } = await axios.get("http://localhost:5000/letterList");
+      console.log("data입니다", data);
+      localStorage.setItem("letterList", JSON.stringify(newLetter));
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err);
+    }
+  }
+);
+
 export const __getTodos = createAsyncThunk(
   "getTodos",
   async (payload, thunkAPI) => {
@@ -103,16 +118,16 @@ const letterReducer = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(__getTodos.pending, (state, action) => {
+      .addCase(__addLetter.pending, (state, action) => {
         state.isLoading = true;
         state.isError = false;
       })
-      .addCase(__getTodos.fulfilled, (state, action) => {
+      .addCase(__addLetter.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isError = false;
         state.letterList = action.payload;
       })
-      .addCase(__getTodos.rejected, (state, action) => {
+      .addCase(__addLetter.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.error = action.error.message;

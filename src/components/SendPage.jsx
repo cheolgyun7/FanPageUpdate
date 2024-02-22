@@ -2,8 +2,9 @@ import React from "react";
 import { SendForm } from "styles/theme";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import { newMessage } from "../redux/reducer";
+import { __addLetter, newMessage } from "../redux/reducer";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 const SendPage = () => {
   const { userId, avatar, nickname } = useSelector((state) => state.auth);
@@ -29,21 +30,18 @@ const SendPage = () => {
       alert("수신인을 선택하세요");
       return;
     }
-    try {
-      const response = await axios.post("http://localhost:5000/letterList", {
-        title,
-        context,
-        selectBox,
-        userId,
-        nickname,
-        avatar,
-        createdAt: new Date().toISOString(),
-      });
-      dispatch(newMessage(response.data));
-      e.target.reset();
-    } catch (error) {
-      console.error(error);
-    }
+    const newLetter = {
+      id: uuidv4(),
+      nickname,
+      title,
+      context,
+      selectBox,
+      userId,
+      avatar,
+      createAt: new Date().toISOString(),
+    };
+    e.target.reset();
+    dispatch(__addLetter(newLetter));
   };
   return (
     <>
