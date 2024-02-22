@@ -1,0 +1,34 @@
+{
+  "letterList": [
+    {
+      "id": "b439",
+      "title": "1",
+      "context": "1",
+      "selectBox": "Karina",
+      "userId": "aouja2",
+      "nickname": "aouja2",
+      "avatar": "null",
+      "createdAt": "2024-02-21T02:18:53.902Z"
+    },
+    {
+      "id": "563f",
+      "title": "2",
+      "context": "2",
+      "selectBox": "Winter",
+      "userId": "aouja3",
+      "nickname": "aouja3",
+      "avatar": null,
+      "createdAt": "2024-02-21T02:21:22.364Z"
+    },
+    {
+      "id": "9987",
+      "title": "3",
+      "context": "3",
+      "selectBox": "Giselle",
+      "userId": "aouja2",
+      "nickname": "aouja2",
+      "avatar": null,
+      "createdAt": "2024-02-21T03:39:18.880Z"
+    }
+  ]
+}

@@ -1,23 +1,38 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { __getTodos, selectMember } from "../redux/reducer";
 
 const SendList = () => {
   const navigate = useNavigate();
-  // letterList가 비어있는 경우 스팬 태그 반환
+  const dispatch = useDispatch();
+  const { isLoading, error, letterList, selectedMember } = useSelector(
+    (state) => state.letter
+  );
 
-  const letterList = useSelector((state) => state.letterList);
-  const selectedMember = useSelector((state) => state.selectedMember);
-  //선택된멤버를 조건문으로
+  // useEffect를 사용하여 초기 데이터를 불러옴
+  useEffect(() => {
+    dispatch(__getTodos());
+  }, []);
+  if (isLoading) {
+    return <div>로딩중.........</div>;
+  }
+  if (error) {
+    return <div>{error.message}</div>;
+  }
+
+  // letterList가 비어있는 경우 스팬 태그 반환
   if (letterList.length === 0) {
     return <span>letterList가 비어 있습니다.</span>;
   }
+
   const filteredList = selectedMember
     ? letterList.filter((item) => item.selectBox === selectedMember)
     : letterList;
 
   const handleDetail = (list) => {
+    console.log(list);
     navigate(`/detail/${list.id}`, { state: list });
   };
   return (
@@ -27,7 +42,7 @@ const SendList = () => {
           filteredList.map((list) => {
             return (
               <Card onClick={() => handleDetail(list)} key={list.id}>
-                <Nickname>{`닉네임 : ${list.nickname}`}</Nickname>
+                <Nickname>{`제목 : ${list.title}`}</Nickname>
                 <CardContext>{`내용 : ${list.context}`}</CardContext>
                 <CardDate>
                   {`등록시간 : ${new Date(list.createdAt).toLocaleDateString(

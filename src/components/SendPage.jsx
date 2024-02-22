@@ -1,21 +1,23 @@
 import React from "react";
 import { SendForm } from "styles/theme";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { newMessage } from "../redux/action";
+import { useDispatch, useSelector } from "react-redux";
+import { newMessage } from "../redux/reducer";
+import axios from "axios";
 
 const SendPage = () => {
+  const { userId, avatar, nickname } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const formSubmit = (e) => {
+  const formSubmit = async (e) => {
     e.preventDefault();
-    const nickname = e.target.nickname.value;
+    const title = e.target.title.value;
     const context = e.target.context.value;
     const selectBox = e.target.select.value;
-    if (!nickname && !context && !selectBox) {
+    if (!title && !context && !selectBox) {
       alert("닉네임을 입력하세요");
       return;
     }
-    if (!nickname) {
+    if (!title) {
       alert("닉네임을 입력하세요");
       return;
     }
@@ -27,25 +29,30 @@ const SendPage = () => {
       alert("수신인을 선택하세요");
       return;
     }
-    dispatch(
-      newMessage({
-        id: crypto.randomUUID(),
-        nickname,
+    try {
+      const response = await axios.post("http://localhost:5000/letterList", {
+        title,
         context,
         selectBox,
-        createdAt: new Date(),
-      })
-    );
-    e.target.reset();
+        userId,
+        nickname,
+        avatar,
+        createdAt: new Date().toISOString(),
+      });
+      dispatch(newMessage(response.data));
+      e.target.reset();
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <>
       <SendForm onSubmit={formSubmit}>
         <Section>
-          <Label>닉네임 : </Label>
+          <Label>제목 : </Label>
           <input
             type="text"
-            name="nickname"
+            name="title"
             style={{
               width: "50%",
               padding: "0.5rem",
